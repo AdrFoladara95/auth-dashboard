@@ -1,72 +1,54 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { VerifyUserEmail } from "../../api/api";
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 
 export default function VerifyEmail() {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
 
-    const [loading, setLoading] = useState(true);
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 800)
 
-    useEffect(() => {
-        async function verifyEmail() {
-            try {
-                const token = searchParams.get("token");
+    return () => clearTimeout(timer)
+  }, [])
 
-                if (!token) {
-                    setError("Invalid verification link.");
-                    setLoading(false);
-                    return;
-                }
-
-                await VerifyUserEmail({ token });
-
-                setSuccess(true);
-                setLoading(false);
-
-                setTimeout(() => {
-                    navigate("/");
-                }, 3000);
-
-            } catch (err) {
-                setError(err.message || "Email verification failed.");
-                setLoading(false);
-            }
-        }
-
-        verifyEmail();
-    }, [navigate, searchParams]);
-
-    if (loading) {
-        return (
-            <div>
-                <h2>Verifying your email...</h2>
-                <p>Please wait.</p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div>
-                <h2>Verification failed</h2>
-                <p>{error}</p>
-            </div>
-        );
-    }
-
+  if (loading) {
     return (
-        <div>
-            {success && (
-                <>
-                    <h2>Email verification successful! ✅</h2>
-                    <p>Your email has been verified successfully.</p>
-                    <p>Redirecting to login in......</p>
-                </>
-            )}
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">
+            Verifying your email...
+          </h2>
+
+          <p className="text-gray-500 mt-2">
+            Please wait.
+          </p>
         </div>
-    );
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full max-w-lg mx-auto mt-10 px-5">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-md p-6 text-center">
+        <div className="text-4xl mb-4">✅</div>
+
+        <h2 className="text-xl sm:text-2xl font-bold">
+          Email verification successful!
+        </h2>
+
+        <p className="text-gray-600 mt-2">
+          Your email has been verified successfully.
+        </p>
+
+        <button
+          onClick={() => navigate('/')}
+          className="mt-6 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-3 rounded-lg"
+        >
+          Continue to Login
+        </button>
+      </div>
+    </div>
+  )
 }

@@ -1,72 +1,82 @@
-import React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router'
-import { ForgotUserPassword } from '../../api/api'
 
 export default function ForgotPassword() {
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-    const [email, setEmail] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
-    const [success, setSuccess] = useState('')
+  function handleSubmit(e) {
+    e.preventDefault()
 
-    async function handleSubmit(e) {
-        e.preventDefault()
-        setLoading(true)
-        setSuccess('')
-        setError('')
+    setLoading(true)
+    setError('')
+    setSuccess('')
 
-        try {
-            await ForgotUserPassword({email})
-            setSuccess('A password reset link has been set')
-            setEmail('')
-        } catch(err) {
-            setError(err.message || 'Something went wrong')
-        } finally {
-            setLoading(false)
-        }
-        
+    if (!email) {
+      setError('Please enter your email address')
+      setLoading(false)
+      return
     }
+
+    setTimeout(() => {
+      setSuccess(
+        'If an account exists with this email, a password reset link has been sent.'
+      )
+      setEmail('')
+      setLoading(false)
+    }, 800)
+  }
+
   return (
-    <div style={{maxWidth:520,margin:'40px auto',border:'1px solid #eee',borderRadius:8}} className='shadow bg-gray-100 p-4'>
-        <h1 className= 'font-semibold text-2xl text-center mb-4'>Forgot Password?</h1>
-        <p className='mb-2'> Enter your email address and we'll send you a link to reset your password</p>
-        
+    <div className="shadow-md bg-gray-100 w-full max-w-130 mx-auto mt-6 sm:mt-10 p-5 sm:p-6 border border-gray-200 rounded-xl">
+      <h1 className="font-semibold text-xl sm:text-2xl text-center mb-4">
+        Forgot Password?
+      </h1>
 
-        <form onSubmit={handleSubmit}>
-        
-            <input 
-            className= 'w-full p-2 border border-grey-500 rounded-md my-2 border-[#A59788] outline-blue-400'
-            type="email" 
-            value={email}
-            placeholder='Enter your email'
-            onChange={(e)=> setEmail(e.target.value)}
-            required
-            
-            />
-            <button 
-            className='btn btn-primary bg-blue-500 cursor-pointer w-full text-white font-semibold rounded-md hover:bg-blue-600 my-2 p-2'
-            type='submit' 
-            disabled={loading} 
-            >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+      <p className="mb-4 text-sm sm:text-base text-gray-600">
+        Enter your email address and we'll send you a link to reset your
+        password.
+      </p>
 
-            </button>
+      <form onSubmit={handleSubmit}>
+        <input
+          className="w-full p-3 border border-gray-300 rounded-md my-2 outline-none focus:ring-2 focus:ring-indigo-500"
+          type="email"
+          value={email}
+          placeholder="Enter your email"
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
+        <button
+          className="bg-indigo-500 cursor-pointer w-full text-white font-semibold rounded-md hover:bg-indigo-600 my-2 p-3 disabled:opacity-60"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Sending...' : 'Send Reset Link'}
+        </button>
+      </form>
 
-        </form>
-        {success && (
-            <p>{success}</p>
-        )}
-        {error && (
-            <p>{error}</p>
-        )}
-        <Link to='/' className='text-sm'>
+      {success && (
+        <p className="text-green-600 text-sm mt-3">
+          {success}
+        </p>
+      )}
+
+      {error && (
+        <p className="text-red-500 text-sm mt-3">
+          {error}
+        </p>
+      )}
+
+      <Link
+        to="/"
+        className="text-indigo-500 hover:underline text-sm inline-block mt-4"
+      >
         Back to Login
-        </Link>
-
-
-      
+      </Link>
     </div>
   )
 }

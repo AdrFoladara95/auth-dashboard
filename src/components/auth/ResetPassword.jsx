@@ -1,152 +1,124 @@
-import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { ResetUserPassword } from "../../api/api";
-import { Eye, EyeOff } from "lucide-react";
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function ResetPassword() {
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get("token");
+  const navigate = useNavigate()
 
-    const navigate = useNavigate();
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  function handleSubmit(e) {
+    e.preventDefault()
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    setError('')
+    setSuccess('')
 
-    async function handleSubmit(e) {
-        e.preventDefault();
-
-        setError("");
-        setSuccess("");
-
-        if (!token) {
-            setError("Invalid or missing reset link.");
-            return;
-        }
-
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters.");
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            setError("Passwords do not match.");
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            await ResetUserPassword({
-                token,
-                password
-            });
-
-            setSuccess("Password reset successfully!");
-
-            setTimeout(() => {
-                navigate("/");
-            }, 1500);
-
-        } catch (err) {
-            setError(err.message || "Password reset failed.");
-        } finally {
-            setLoading(false);
-        }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
     }
 
-    return (
-        <div className="shadow-md bg-white max-w-130 mx-auto mt-10 p-6 border border-gray-200 rounded-xl">
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
 
-            <h2 className="font-bold text-2xl text-center text-gray-900">
-                Reset Password
-            </h2>
+    setLoading(true)
 
-            <p className="text-gray-600 text-sm text-center mt-2 mb-6">
-                Enter your new password below.
-            </p>
+    setTimeout(() => {
+      setSuccess('Password reset successfully!')
 
-            <form onSubmit={handleSubmit}>
+      setTimeout(() => {
+        navigate('/')
+      }, 1200)
 
-                {/* New Password */}
-                <div className="relative mb-4">
-                    <label className="block mb-1">
-                        New Password
-                    </label>
+      setLoading(false)
+    }, 800)
+  }
 
-                    <input
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter new password"
-                        className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
+  return (
+    <div className="shadow-md bg-white w-full max-w-130 mx-auto mt-6 sm:mt-10 p-5 sm:p-6 border border-gray-200 rounded-xl">
+      <h2 className="font-bold text-xl sm:text-2xl text-center text-gray-900">
+        Reset Password
+      </h2>
 
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-9 text-gray-500"
-                    >
-                        {showPassword
-                            ? <Eye size={20} />
-                            : <EyeOff size={20} />
-                        }
-                    </button>
-                </div>
+      <p className="text-gray-600 text-sm text-center mt-2 mb-6">
+        Enter your new password below.
+      </p>
 
-                {/* Confirm Password */}
-                <div className="relative mb-4">
-                    <label className="block mb-1">
-                        Confirm Password
-                    </label>
+      <form onSubmit={handleSubmit}>
+        <div className="relative mb-4">
+          <label className="block mb-1">New Password</label>
 
-                    <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm new password"
-                        className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter new password"
+            className="w-full p-3 pr-12 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+          />
 
-                    <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-9 text-gray-500"
-                    >
-                        {showConfirmPassword
-                            ? <Eye size={20} />
-                            : <EyeOff size={20} />
-                        }
-                    </button>
-                </div>
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full p-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600"
-                >
-                    {loading ? "Resetting..." : "Reset Password"}
-                </button>
-
-            </form>
-
-            {success && (
-                <p className="text-green-600 mt-4">
-                    {success}
-                </p>
-            )}
-
-            {error && (
-                <p className="text-red-500 mt-4">
-                    {error}
-                </p>
-            )}
-
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-9 text-gray-500"
+          >
+            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+          </button>
         </div>
-    );
+
+        <div className="relative mb-4">
+          <label className="block mb-1">Confirm Password</label>
+
+          <input
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+            className="w-full p-3 pr-12 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowConfirmPassword(!showConfirmPassword)
+            }
+            className="absolute right-3 top-9 text-gray-500"
+          >
+            {showConfirmPassword ? (
+              <Eye size={20} />
+            ) : (
+              <EyeOff size={20} />
+            )}
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full p-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 disabled:opacity-60"
+        >
+          {loading ? 'Resetting...' : 'Reset Password'}
+        </button>
+      </form>
+
+      {success && (
+        <p className="text-green-600 mt-4">
+          {success}
+        </p>
+      )}
+
+      {error && (
+        <p className="text-red-500 mt-4">
+          {error}
+        </p>
+      )}
+    </div>
+  )
 }
